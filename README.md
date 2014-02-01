@@ -1,6 +1,52 @@
-# kawapp
+# Kawapp
 
 Kyukou asynchronous Web application framework
+
+## Synopsis
+
+```js
+TBD
+```
+
+## Kawapp is...
+
+* simple. No special classes or objects other than Kawapp are required.
+  This uses a plain object to manage request context (locals).
+  This uses a jQuery object to draw a response content, on the other hand.
+  jQuery is not required, in fact, as Kawapp includes a mini-subset of jQuery.
+
+* a framework which run on browser environments, of course.
+
+* a framework which run on node.js environment.
+  This means your same code could run on both side of server and client.
+  Thin jQuery clone [Cheerio](https://npmjs.org/package/cheerio) is also
+  available to run this on node.js.
+
+* test ready.
+  Node.js's test frameworks would help you to develop client applications as well.
+
+* super light-weight. Minified version of this only take 3KB.
+
+## Kawapp is NOT...
+
+* a template engine. Use great template engines such as
+  [Hogan.js](http://twitter.github.io/hogan.js/),
+  [Handlebars.js](http://handlebarsjs.com), etc.
+  Kawapp works great with those third party template engines.
+
+* a HTTP server. Use [Express.js](http://expressjs.com) as usual.
+
+## Download
+
+* https://raw.github.com/kawanet/kawapp/master/kawapp.js -
+  source
+
+* https://raw.github.com/kawanet/kawapp/master/dist/kawapp.min.js -
+  minified (3KB)
+
+## Notes
+
+"Kyukou" means "Express" in Japanese.
 
 ## MIT Licence
 
