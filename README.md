@@ -5,8 +5,43 @@ Kyukou asynchronous Web application framework
 ## Synopsis
 
 ```js
-TBD
+var kawapp = require("kawapp");  // for node.js
+
+// setup application
+var app = kawapp();
+app.use(kawapp.parseQuery());    // index.html?name=Ken
+app.use(kawapp.parseHash());     // index.html#!?name=Alex
+app.mount("/about/", about);
+app.mount("/contact/", contact);
+app.use(notfound);
+
+// run application
+var req = { name: "John" };
+var res = $("#canvas");
+app.start(req, res, end);
+
+// page middlewares
+function about(req, res, next) {
+  res.empty().append("my name is " + req.name);
+  next();
+}
+
+function contact(req, res, next) {
+  res.html('<a href="http://twitter.com/kawanet">@kawanet</a>');
+  next();
+}
+
+function notfound(req, res, next) {
+  next(new Error("invalid request"));
+}
+
+// callback at last
+function end(err, res) {
+  if (err) console.log('err', err);
+}
 ```
+
+See [API reference](http://kawanet.github.io/kawapp/docs/kawapp.html) for more detail:
 
 ## Kawapp is...
 
@@ -16,10 +51,12 @@ TBD
   jQuery is not required, in fact, as Kawapp includes a mini-subset of jQuery.
 
 * a framework which run on browser environments, of course.
+  Kawapp works perfect for modern Ajax applications.
 
-* a framework which run on node.js environment.
-  This means your same code could run on both side of server and client.
-  Thin jQuery clone [Cheerio](https://npmjs.org/package/cheerio) is also
+* a framework which run on node.js environment as well.
+  Kawapp works gorgeous for CGI-style web applications.
+  This means your same code could perform on both side of server and client.
+  Lean jQuery clone [Cheerio](https://npmjs.org/package/cheerio) is also
   available to run this on node.js.
 
 * test ready.
@@ -29,14 +66,17 @@ TBD
 
 ## Kawapp is NOT...
 
-* a template engine. Use great template engines such as
+* a template engine. Use well known template engines such as
   [Hogan.js](http://twitter.github.io/hogan.js/),
   [Handlebars.js](http://handlebarsjs.com), etc.
-  Kawapp works great with those third party template engines.
+  Kawapp works great with those third party engines.
 
 * a HTTP server. Use [Express.js](http://expressjs.com) as usual.
 
-## Download
+## Links
+
+* http://kawanet.github.io/kawapp/docs/kawapp.html -
+  API reference
 
 * https://raw.github.com/kawanet/kawapp/master/kawapp.js -
   source
@@ -44,7 +84,7 @@ TBD
 * https://raw.github.com/kawanet/kawapp/master/dist/kawapp.min.js -
   minified (3KB)
 
-## Notes
+## Note
 
 "Kyukou" means "Express" in Japanese.
 
