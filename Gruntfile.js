@@ -9,6 +9,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-quote-json');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
   var jshint_src = [
     './*.js',
@@ -86,9 +87,23 @@ module.exports = function(grunt) {
           }
         }
       }
+    },
+
+    // https://github.com/krampstudio/grunt-jsdoc-plugin
+    jsdoc: {
+      all: {
+        src: [pkg.main]
+      },
+      options: {
+        destination: 'gh-pages/docs',
+        "plugins": ["plugins/markdown"],
+        "markdown": {
+          "parser": "gfm"
+        }
+      }
     }
   });
 
   // grunt # デフォルトは jshint とテストだけ
-  grunt.registerTask('default', ['jshint', 'quoteJson', 'uglify', 'mochaTest']);
+  grunt.registerTask('default', ['jshint', 'quoteJson', 'uglify', 'mochaTest', 'jsdoc']);
 };

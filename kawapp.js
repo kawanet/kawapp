@@ -6,7 +6,7 @@
 
 /**
  * Application class
- * @constructor
+ * @class kawapp
  */
 function kawapp() {
   if (!(this instanceof kawapp)) return new kawapp();
@@ -22,23 +22,71 @@ function kawapp() {
   kawapp.response = response;
 
   /**
-   * @type {anonymous} Flag to terminate the middleware sequence.
+   * Signal to terminate the middleware sequence.
+   *
+   * @member {anonymous} kawapp.END
    */
-  kawapp.END = { end: true };
+  /**
+   * Signal to terminate the middleware sequence.
+   *
+   * @member {anonymous} kawapp.prototype.END
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(function(req, res, next) {
+   *   next(kawapp.END); // send END signal to stop the application
+   * });
+   *
+   * app.use(other_mw);  // this middleware will never be invoked
+   */
+  kawapp.prototype.END = kawapp.END = { end: true };
 
   /**
-   * @type {anonymous} Flag to skip the middleware sequence.
+   * Signal to skip the middleware sequence.
+   *
+   * @member {anonymous} kawapp.SKIP
    */
-  kawapp.SKIP = { skip: true };
+  /**
+   * Signal to skip the middleware sequence.
+   *
+   * @member {anonymous} kawapp.prototype.SKIP
+   * @example
+   * var sub = kawapp();
+   * sub.use(function(req, res, next) {
+   *   next(kawapp.SKIP);
+   * });
+   * sub.use(mw1); // this middleware will never be invoked
+   *
+   * var main = kawapp();
+   * main.use(sub);
+   * main.use(mw2); // this middleware will be invoked otherwise
+   */
+  kawapp.prototype.SKIP = kawapp.SKIP = { skip: true };
 
   /**
-   * @type {number} Number of middlewares installed
+   * Number of middlewares installed.
+   * This means kawapp instance behaves as an Array-like object.
+   * @type {Number}
    */
   kawapp.prototype.length = 0;
 
   /**
    * Install middlewares.
    * @param {...Function} mw - Middleware(s) to install
+   * @returns {kawapp}
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(function(req, res, next) {
+   *   var text = req.ok ? "OK" : "NG"; // use req as a locals
+   *   res.append(text);                // use res with append() html() empty() methods
+   *   next();                          // callback to chain middlewares
+   * });
+   *
+   * app.use(function(req, res, next) {
+   *   var err = new Error("something wrong");
+   *   next(err);                       // send error to terminate the application
+   * });
    */
   kawapp.prototype.use = function(mw) {
     for (var i in arguments) {
@@ -51,6 +99,17 @@ function kawapp() {
    * Install middlewares which are invoked when conditional function returns true.
    * @param {Function} cond - Conditional function
    * @param {...Function} mw - Middleware(s) to install
+   * @returns {kawapp}
+   * @example
+   * var app = kawapp();
+   *
+   * app.useif(test, mw1, mw2);     // mw1&mw2 will be invoked when condition is true
+   *
+   * app.use(mw3, mw4);             // mw3&mw4 will be invoked when condition is false
+   *
+   * function test(req, res) {
+   *   return (req.key == "value"); // test something
+   * }
    */
   kawapp.prototype.useif = function(cond, mw) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -78,8 +137,17 @@ function kawapp() {
 
   /**
    * Install middlewares which are invoked when path matches.
-   * @param {String} path
+   * @param {String|RegExp} path - pathname to test
    * @param {...Function} mw - Middleware(s) to install
+   * @returns {kawapp}
+   * @example
+   * var app = kawapp();
+   *
+   * app.mount("/about/", about_mw);        // test pathname with string
+   *
+   * app.mount(/^\/contact\//, contact_mw); // test pathname with regexp
+   *
+   * app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run
    */
   kawapp.prototype.mount = function(path, mw) {
     var args = Array.prototype.slice.call(arguments, 1);
@@ -106,10 +174,20 @@ function kawapp() {
 
   /**
    * Start application.
-   * @param [req] - context object or request object
-   * @param [res] - response object such as jQuery instance
+   * @param {Object} [req] - context object a.k.a. locals
+   * @param {response|jQuery|cheerio} [res] - response object such as jQuery object
    * @param {Function} [callback] - callback function
    * @returns {kawapp}
+   * @example
+   * var app = kawapp();
+   * app.use(mw1);              // install some middlewares
+   *
+   * var context = {};          // plain object as a request context
+   * var canvas = $("#canvas"); // jQuery object as a response canvas
+   *
+   * app.start(context, canvas, function(err, res) {
+   *   if (err) console.error(err);
+   * });
    */
   kawapp.prototype.start = function(req, res, callback) {
     // both request and response are optional
@@ -137,9 +215,15 @@ function kawapp() {
   };
 
   /**
-   * Merge multiple middlewares and applications as a single middleware.
+   * Merge multiple middlewares (or kawapp applications) as a single middleware.
    * @param {...Function} mw - middlewars or applications
    * @returns {Function} middleware merged
+   * @example
+   * var app = kawapp();
+   *
+   * var mw = kawapp.merge(mw1, mw2, mw3);  // merge multiple middlewares
+   *
+   * app.use(mw);                           // use it as a middleware
    */
   kawapp.merge = function(mw) {
     var args = arguments;
@@ -165,9 +249,22 @@ function kawapp() {
   };
 
   /**
-   * Middleware to set location
+   * Middleware to set location.
+   * This would be great when running kawapp not on a browser environment.
    * @param {Object} [defaults] - default location object
    * @returns {Function} middleware
+   * @example
+   * var app = kawapp();
+   *
+   * var loc = {
+   *   href: "http://www.example.com/about"
+   * };
+   * app.use(kawapp.location(loc));     // store default location
+   *
+   * app.use(function(req, res, next) {
+   *   console.log(req.location.href);  // fetch location in a middleware
+   *   next();
+   * });
    */
   kawapp.location = function(defaults) {
     /* global location */
@@ -187,7 +284,9 @@ function kawapp() {
    * @returns {Function} middleware
    * @example
    * var app = kawapp();
+   *
    * app.use(kawapp.locationSearch());             // without defaults
+   *
    * app.use(kawapp.locationSearch("?key=value")); // with defaults
    */
   kawapp.parseQuery = function(defaults) {
@@ -219,7 +318,9 @@ function kawapp() {
    * @returns {Function} middleware
    * @example
    * var app = kawapp();
+   *
    * app.use(kawapp.locationHash());               // without defaults
+   *
    * app.use(kawapp.locationHash("#!?key=value")); // with defaults
    */
   kawapp.parseHash = function(defaults) {
@@ -246,10 +347,12 @@ function kawapp() {
   };
 
   /**
-   * Alternative lightwight response class.
+   * Alternative lightweight response class.
    * On node.js environment, use a jQuery or cheerio object instead.
-   * On browser environment, use a jQuery object instead.
-   * @constructor
+   * On browser environment, use a jQuery object for most purpose.
+   * This class exists to define a common interface for response objects.
+   *
+   * @class kawapp.response
    */
   function response() {
     if (!(this instanceof response)) return new response();
@@ -257,23 +360,50 @@ function kawapp() {
   }
 
   /**
-   * Always returns 1. This allows a response behaves Array-like object.
-   * @type {number}
+   * Always returns 1.
+   * Response object behaves Array-like object which has an item.
+   *
+   * @member {Number} kawapp.response.prototype.length
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(some_mw);
+   *
+   * app.start(function(err, res) {
+   *   $("#canvas").append(res[0]);
+   * });
    */
   response.prototype.length = 1;
 
   /**
-   * Flush response.
-   * @returns {response} for method chaining.
-   */
+   * Flush the current response.
+   *
+   * @method kawapp.response.prototype.empty
+   * @returns {response} response object for method chaining.
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(function(req, res, next) {
+   *   res.empty().append("hi, there!");
+   * });   */
   response.prototype.empty = function() {
     this[0].length = 0;
     return this;
   };
 
   /**
-   * Append a block of HTML.
-   * @returns {response} for method chaining.
+   * Append a block of HTML to the current.
+   *
+   * @method kawapp.response.prototype.append
+   * @param {...String} html - HTML to append
+   * @returns {response} response object for method chaining.
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(function(req, res, next) {
+   *   res.append("foo");
+   *   res.append("bar");
+   * });
    */
   response.prototype.append = function() {
     var args = Array.prototype.slice.call(arguments);
@@ -285,7 +415,21 @@ function kawapp() {
   };
 
   /**
-   * Update or retrieve response HTML.
+   * Replace or retrieve the current HTML.
+   *
+   * @method kawapp.response.prototype.html
+   * @param {String} [html] - HTML to replace
+   * @returns {String|response} HTML to retrieve, or response object for method chaining.
+   * @example
+   * var app = kawapp();
+   *
+   * app.use(function(req, res, next) {
+   *   res.html("Hello!");
+   * });
+   *
+   * app.start(function(err, res) {
+   *   console.log(res.html());       // => "Hello!"
+   * });
    */
   response.prototype.html = function(html) {
     if (arguments.length) {
