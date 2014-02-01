@@ -1,6 +1,6 @@
 var assert = require("assert");
 var kawapp = require("../kawapp");
-var kawappmin = require("../public/kawapp.min");
+var kawappmin = require("../dist/kawapp.min");
 
 var filename = __filename.replace(/.*\//, "") + ":";
 describe(filename, run);

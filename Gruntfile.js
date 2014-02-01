@@ -64,7 +64,7 @@ module.exports = function(grunt) {
     uglify: {
       production: {
         files: {
-          'public/kawapp.min.js': ['kawapp.js']
+          'dist/kawapp.min.js': ['kawapp.js']
         },
         options: {
           banner: '/*! ' + pkg.name + ' ' + pkg.version + ' */\n'
