@@ -8,6 +8,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-quote-json');
 
   var jshint_src = [
     './*.js',
@@ -65,12 +66,29 @@ module.exports = function(grunt) {
           'public/kawapp.min.js': ['kawapp.js']
         },
         options: {
-          banner: '/*! ' + pkg.version + ' */\n'
+          banner: '/*! ' + pkg.name + ' ' + pkg.version + ' */\n'
+        }
+      }
+    },
+
+    // https://github.com/kawanet/grunt-quote-json
+    quoteJson: {
+      bower: {
+        src: 'package.json',
+        dest: 'bower.json',
+        options: {
+          fields: {
+            name: 1,
+            version: 1,
+            description: 1,
+            license: 1,
+            repository: 1
+          }
         }
       }
     }
   });
 
   // grunt # デフォルトは jshint とテストだけ
-  grunt.registerTask('default', ['jshint', 'mochaTest', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'quoteJson', 'uglify', 'mochaTest']);
 };

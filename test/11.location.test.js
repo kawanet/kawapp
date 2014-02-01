@@ -7,8 +7,8 @@ describe(filename, tests(kawapp));
 function tests(kawapp) {
   return function() {
     var loc = {
-      search: "?foo=FOO",
-      hash: "#!?bar=BAR"
+      search: "?foo=FOO&buz=BUZ",
+      hash: "#!?bar=BAR&qux=QUX"
     };
 
     it('parseQuery', function(done) {
@@ -17,7 +17,9 @@ function tests(kawapp) {
       app.use(kawapp.parseQuery());
       app.use(function(req, res, next) {
         assert.equal(req.foo, "FOO");
+        assert.equal(req.buz, "BUZ");
         assert.notEqual(req.bar, "BAR");
+        assert.notEqual(req.qux, "QUX");
         next();
         done();
       });
@@ -31,7 +33,9 @@ function tests(kawapp) {
       app.use(kawapp.parseHash());
       app.use(function(req, res, next) {
         assert.notEqual(req.foo, "FOO");
+        assert.notEqual(req.buz, "BUZ");
         assert.equal(req.bar, "BAR");
+        assert.equal(req.qux, "QUX");
         next();
         done();
       });

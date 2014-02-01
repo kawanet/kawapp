@@ -277,8 +277,9 @@ function kawapp() {
    */
   response.prototype.append = function() {
     var args = Array.prototype.slice.call(arguments);
+    var list = this[0];
     args.forEach(function(item) {
-      this[0].push(item);
+      list.push(item);
     });
     return this;
   };

@@ -1,0 +1,23 @@
+{
+  "name": "kawapp",
+  "version": "0.0.1",
+  "description": "Kyukou asynchronous Web application framework",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kawanet/kawapp.git"
+  },
+  "main": "kawapp.js",
+  "authors": [
+    "kawanet"
+  ],
+  "homepage": "https://github.com/kawanet/kawapp",
+  "ignore": [
+    "**/.*",
+    "*.json",
+    "Gruntfile.js",
+    "node_modules",
+    "bower_components",
+    "test"
+  ]
+}
