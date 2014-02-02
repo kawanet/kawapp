@@ -14,7 +14,7 @@ function tests(kawapp) {
     it('parseQuery', function(done) {
       var app = kawapp();
       var req = { location: loc };
-      app.use(kawapp.parseQuery());
+      app.use(kawapp.mw.parseQuery());
       app.use(function(req, res, next) {
         assert.equal(req.foo, "FOO");
         assert.equal(req.buz, "BUZ");
@@ -23,14 +23,13 @@ function tests(kawapp) {
         next();
         done();
       });
-      app.use(kawapp.parseQuery());
       app.start(req);
     });
 
     it('parseHash', function(done) {
       var app = kawapp();
       var req = { location: loc };
-      app.use(kawapp.parseHash());
+      app.use(kawapp.mw.parseHash());
       app.use(function(req, res, next) {
         assert.notEqual(req.foo, "FOO");
         assert.notEqual(req.buz, "BUZ");
@@ -39,7 +38,6 @@ function tests(kawapp) {
         next();
         done();
       });
-      app.use(kawapp.parseQuery());
       app.start(req);
     });
   };

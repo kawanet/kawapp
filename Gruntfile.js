@@ -1,5 +1,6 @@
 /*! Gruntfile.js */
 
+
 module.exports = function(grunt) {
 
   var pkg = require('./package.json');
@@ -28,6 +29,13 @@ module.exports = function(grunt) {
       all: {
         files: watch_files,
         tasks: ['default'],
+        options: {
+          interrupt: true
+        }
+      },
+      jsdoc: {
+        files: watch_files,
+        tasks: ['jsdoc'],
         options: {
           interrupt: true
         }

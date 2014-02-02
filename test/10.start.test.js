@@ -23,9 +23,9 @@ function tests(kawapp) {
         req.foo = "FOO";
         next();
       });
-      app.use(kawapp.location());
-      app.use(kawapp.parseQuery());
-      app.use(kawapp.parseHash());
+      app.use(kawapp.mw.location());
+      app.use(kawapp.mw.parseQuery());
+      app.use(kawapp.mw.parseHash());
       app.use(function(req, res, next) {
         req.bar = "BAR";
         next();

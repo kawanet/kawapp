@@ -5,7 +5,7 @@
  */
 
 /**
- * Application class
+ * Application class.
  * @class kawapp
  */
 function kawapp() {
@@ -19,17 +19,16 @@ function kawapp() {
   }
 
   kawapp.request = Object;
-  kawapp.response = response;
 
   /**
-   * Signal to terminate the middleware sequence.
+   * Alias to `kawapp.END`.
    *
-   * @member {anonymous} kawapp.END
+   * @member {Object} kawapp.prototype.END
    */
   /**
-   * Signal to terminate the middleware sequence.
+   * A signature to terminate the middleware sequence.
    *
-   * @member {anonymous} kawapp.prototype.END
+   * @member {Object} kawapp.END
    * @example
    * var app = kawapp();
    *
@@ -42,14 +41,14 @@ function kawapp() {
   kawapp.prototype.END = kawapp.END = { end: true };
 
   /**
-   * Signal to skip the middleware sequence.
+   * Alias to `kawapp.SKIP`.
    *
-   * @member {anonymous} kawapp.SKIP
+   * @member {Object} kawapp.prototype.SKIP
    */
   /**
-   * Signal to skip the middleware sequence.
+   * A signature to skip the middleware sequence.
    *
-   * @member {anonymous} kawapp.prototype.SKIP
+   * @member {Object} kawapp.SKIP
    * @example
    * var sub = kawapp();
    * sub.use(function(req, res, next) {
@@ -71,7 +70,7 @@ function kawapp() {
   kawapp.prototype.length = 0;
 
   /**
-   * Install middlewares.
+   * This installs middleware(s).
    * @param {...Function} mw - Middleware(s) to install
    * @returns {kawapp}
    * @example
@@ -96,16 +95,16 @@ function kawapp() {
   };
 
   /**
-   * Install middlewares which are invoked when conditional function returns true.
+   * This installs middleware(s) which are invoked when conditional function returns true.
    * @param {Function} cond - Conditional function
    * @param {...Function} mw - Middleware(s) to install
    * @returns {kawapp}
    * @example
    * var app = kawapp();
    *
-   * app.useif(test, mw1, mw2);     // mw1&mw2 will be invoked when condition is true
+   * app.useif(test, mw1, mw2);     // mw1&mw2 will be invoked only when condition is true
    *
-   * app.use(mw3, mw4);             // mw3&mw4 will be invoked when condition is false
+   * app.use(mw3, mw4);             // mw3&mw4 will be invoked only when condition is false
    *
    * function test(req, res) {
    *   return (req.key == "value"); // test something
@@ -136,7 +135,8 @@ function kawapp() {
   };
 
   /**
-   * Install middlewares which are invoked when path matches.
+   * This installs middleware(s) which are invoked when `location.pathname` matches.
+   *
    * @param {String|RegExp} path - pathname to test
    * @param {...Function} mw - Middleware(s) to install
    * @returns {kawapp}
@@ -147,14 +147,14 @@ function kawapp() {
    *
    * app.mount(/^\/contact\//, contact_mw); // test pathname with regexp
    *
-   * app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run
+   * app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to install
    */
   kawapp.prototype.mount = function(path, mw) {
     var args = Array.prototype.slice.call(arguments, 1);
 
     // insert location middleware at the first use of mount()
     if (!this.mounts) {
-      this.use(kawapp.location());
+      this.use(kawapp.mw.location());
       this.mounts = 0;
     }
     this.mounts++;
@@ -173,9 +173,10 @@ function kawapp() {
   };
 
   /**
-   * Start application.
-   * @param {Object} [req] - context object a.k.a. locals
-   * @param {response|jQuery|cheerio} [res] - response object such as jQuery object
+   * This invokes a kawapp application.
+   *
+   * @param {Object} [req] - context object a.k.a. `locals`
+   * @param {response|jQuery|cheerio} [res] - response element such as jQuery object
    * @param {Function} [callback] - callback function
    * @returns {kawapp}
    * @example
@@ -204,7 +205,7 @@ function kawapp() {
     if (!res) res = this.res || kawapp.response();
 
     // compile kawapp as a middleware and run it
-    var mw = kawapp.merge.apply(null, this);
+    var mw = kawapp.mw.merge.apply(null, this);
     mw(req, res, end);
     return this;
 
@@ -213,19 +214,93 @@ function kawapp() {
       if (callback) callback(err, res);
     }
   };
+})(kawapp);
+
+/**
+ * Utility functions.
+ * This provides the following function but no constructor.
+ * @class kawapp.util
+ */
+
+(function(kawapp) {
+  var util = kawapp.util || (kawapp.util = {});
 
   /**
-   * Merge multiple middlewares (or kawapp applications) as a single middleware.
+   * Alias to `kawapp.util`.
+   *
+   * @member {kawapp.util} kawapp.prototype.util
+   */
+  kawapp.prototype.util = util;
+
+  /**
+   * This parses query parameters.
+   *
+   * @method kawapp.util.parseParam
+   * @see https://gist.github.com/kawanet/8384773
+   * @param {String} query string
+   * @returns {Object} parameter parsed
+   * @example
+   * // parse query parameters after "?"
+   * var param1 = kawapp.util.parseParam(location.search.substr(1));
+   *
+   * // parse query parameters after "#!" hash bang
+   * if (location.hash.search(/^#!.*\?/) > -1) {
+   *   var param2 = kawapp.util.parseParam(location.hash.replace(/^#!.*\?/, ""))
+   * }
+   */
+
+  util.parseParam = function(query) {
+    var vars = query.split(/[&;]/);
+    var param = {};
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i];
+      if (!pair.length) continue;
+      var pos = pair.indexOf("=");
+      var key, val;
+      if (pos > -1) {
+        key = pair.substring(0, pos);
+        val = pair.substring(pos + 1);
+      } else {
+        key = val = pair;
+      }
+      key = key.replace(/\+/g, " ");
+      val = val.replace(/\+/g, " ");
+      key = decodeURIComponent(key);
+      val = decodeURIComponent(val);
+      param[key] = val;
+    }
+    return param;
+  };
+})(kawapp);
+
+/**
+ * This provides following functions which return middlewares.
+ * No constructor.
+ * @class kawapp.mw
+ */
+
+(function(kawapp) {
+  var mw = kawapp.mw || (kawapp.mw = {});
+  /**
+   * Alias to `kawapp.mw`.
+   *
+   * @member {kawapp.mw} kawapp.prototype.mw
+   */
+  kawapp.prototype.mw = mw;
+
+  /**
+   * This returns a single middleware combined
+   * with multiple middlewares (or kawapp applications).
+   *
+   * @method kawapp.mw.merge
    * @param {...Function} mw - middlewars or applications
    * @returns {Function} middleware merged
    * @example
    * var app = kawapp();
    *
-   * var mw = kawapp.merge(mw1, mw2, mw3);  // merge multiple middlewares
-   *
-   * app.use(mw);                           // use it as a middleware
+   * app.use(kawapp.mw.merge(mw1, mw2, mw3));
    */
-  kawapp.merge = function(mw) {
+  mw.merge = function(mw) {
     var args = arguments;
     return merge;
 
@@ -241,7 +316,7 @@ function kawapp() {
         }
         mw = args[idx++];
         if (mw instanceof kawapp) {
-          mw = kawapp.merge.apply(null, mw);
+          mw = kawapp.mw.merge.apply(null, mw);
         }
         mw(req, res, iterator);
       }
@@ -249,8 +324,10 @@ function kawapp() {
   };
 
   /**
-   * Middleware to set location.
+   * This returns a middleware to set `location` object.
    * This would be great when running kawapp not on a browser environment.
+   *
+   * @method kawapp.mw.location
    * @param {Object} [defaults] - default location object
    * @returns {Function} middleware
    * @example
@@ -266,7 +343,7 @@ function kawapp() {
    *   next();
    * });
    */
-  kawapp.location = function(defaults) {
+  mw.location = function(defaults) {
     /* global location */
     return _location;
 
@@ -279,33 +356,41 @@ function kawapp() {
   };
 
   /**
-   * Middleware to parse location.search e.g. `/index.html?key=value`
-   * @param {String} [defaults] - default location.search string
+   * This returns a middleware to parse parameters at `location.search`.
+   *
+   * @method kawapp.mw.parseQuery
+   * @param {String} [root] - root key to set parsed queries such as `"param"`
+   * @param {String} [defaults] - default location.search string such as `"?key=value"`
    * @returns {Function} middleware
    * @example
    * var app = kawapp();
    *
-   * app.use(kawapp.locationSearch());             // without defaults
+   * app.use(kawapp.mw.parseQuery("param", "?key=value"));
    *
-   * app.use(kawapp.locationSearch("?key=value")); // with defaults
+   * app.use(function(req, res, next) {
+   *   console.log(req.param.key); // => "value"
+   *   next();
+   * });
    */
-  kawapp.parseQuery = function(defaults) {
+  mw.parseQuery = function(root, defaults) {
     return _parseQuery;
 
     function _parseQuery(req, res, next) {
-      if (req.locationSearch) return next();
-      kawapp.location()(req, res, function(err){
+      if (req.locationSearch) return next(); // already parsed
+      kawapp.mw.location()(req, res, function(err) {
         if (err) return next(err);
         return parseQuery(req, res, next);
       });
     }
 
     function parseQuery(req, res, next) {
+      if (root && !req[root]) req[root] = {};
+      var param = root ? req[root] : req;
       var q = req.location.search || defaults;
       if (q && q.length > 1) {
-        var p = req.locationSearch = parse_query_param(q.substr(1));
+        var p = req.locationSearch = kawapp.util.parseParam(q.substr(1));
         for (var key in p) {
-          req[key] = p[key];
+          param[key] = p[key];
         }
       }
       next();
@@ -313,54 +398,66 @@ function kawapp() {
   };
 
   /**
-   * Middleware to parse location.hash e.g. `/index.html#!?key=value`
-   * @param {String} [defaults] - default location.hash string
+   * This returns a middleware to parse parameters at `location.hash`.
+   *
+   * @method kawapp.mw.parseHash
+   * @param {String} [root] - root key to set parsed queries such as `"param"`
+   * @param {String} [defaults] - default location.hash string such as `"#!?key=value"`
    * @returns {Function} middleware
    * @example
    * var app = kawapp();
    *
-   * app.use(kawapp.locationHash());               // without defaults
+   * app.use(kawapp.parseHash("param", "#!?key=value"));
    *
-   * app.use(kawapp.locationHash("#!?key=value")); // with defaults
+   * app.use(function(req, res, next) {
+   *   console.log(req.param.key); // => "value"
+   *   next();
+   * });
    */
-  kawapp.parseHash = function(defaults) {
+  mw.parseHash = function(root, defaults) {
     return _parseHash;
 
     function _parseHash(req, res, next) {
-      if (req.locationHash) return next();
-      kawapp.location()(req, res, function(err){
+      if (req.locationHash) return next(); // already parsed
+      kawapp.mw.location()(req, res, function(err) {
         if (err) return next(err);
         return parseHash(req, res, next);
       });
     }
 
     function parseHash(req, res, next) {
+      if (root && !req[root]) req[root] = {};
+      var param = root ? req[root] : req;
       var q = req.location.hash || defaults;
       if (q && q.search(/^#!.*\?/) > -1) {
-        var p = req.locationHash = parse_query_param(q.replace(/^#!.*\?/, ""));
+        var p = req.locationHash = kawapp.util.parseParam(q.replace(/^#!.*\?/, ""));
         for (var key in p) {
-          req[key] = p[key];
+          param[key] = p[key];
         }
       }
       next();
     }
   };
+})(kawapp);
 
-  /**
-   * Alternative lightweight response class.
-   * On node.js environment, use a jQuery or cheerio object instead.
-   * On browser environment, use a jQuery object for most purpose.
-   * This class exists to define a common interface for response objects.
-   *
-   * @class kawapp.response
-   */
+/**
+ * This is an alternative lightweight response class.
+ * On node.js environment, use a jQuery or cheerio object instead.
+ * On browser environment, use a jQuery object for most purpose.
+ * This is a reference implementation to define a common interface for response objects.
+ *
+ * @class kawapp.response
+ */
+(function(kawapp) {
+  kawapp.response = response;
+
   function response() {
     if (!(this instanceof response)) return new response();
     this[0] = [];
   }
 
   /**
-   * Always returns 1.
+   * This always returns 1.
    * Response object behaves Array-like object which has an item.
    *
    * @member {Number} kawapp.response.prototype.length
@@ -376,7 +473,7 @@ function kawapp() {
   response.prototype.length = 1;
 
   /**
-   * Flush the current response.
+   * This flushes the current response element.
    *
    * @method kawapp.response.prototype.empty
    * @returns {response} response object for method chaining.
@@ -392,7 +489,7 @@ function kawapp() {
   };
 
   /**
-   * Append a block of HTML to the current.
+   * This appends a block of HTML to the response element.
    *
    * @method kawapp.response.prototype.append
    * @param {...String} html - HTML to append
@@ -415,11 +512,11 @@ function kawapp() {
   };
 
   /**
-   * Replace or retrieve the current HTML.
+   * This replaces or retrieves HTML source of the response element.
    *
    * @method kawapp.response.prototype.html
    * @param {String} [html] - HTML to replace
-   * @returns {String|response} HTML to retrieve, or response object for method chaining.
+   * @returns {String|response} HTML to retrieve, or response element for method chaining.
    * @example
    * var app = kawapp();
    *
@@ -461,37 +558,4 @@ function kawapp() {
       return array.join("");
     }
   };
-
-  /**
-   * @private
-   * @see https://gist.github.com/kawanet/8384773
-   * @param {String} query string
-   * @returns {Object} parameter
-   * @example
-   * var param1 = parse_query_param(location.search.substr(1));
-   * var param2 = parse_query_param(location.hash.search(/^#!.*\?/)?"":location.hash.replace(/^#!.*\?/, ""))
-   */
-
-  function parse_query_param(query) {
-    var vars = query.split(/[&;]/);
-    var param = {};
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i];
-      if (!pair.length) continue;
-      var pos = pair.indexOf("=");
-      var key, val;
-      if (pos > -1) {
-        key = pair.substring(0, pos);
-        val = pair.substring(pos + 1);
-      } else {
-        key = val = pair;
-      }
-      key = key.replace(/\+/g, " ");
-      val = val.replace(/\+/g, " ");
-      key = decodeURIComponent(key);
-      val = decodeURIComponent(val);
-      param[key] = val;
-    }
-    return param;
-  }
 })(kawapp);
