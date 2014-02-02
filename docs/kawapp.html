@@ -47,7 +47,7 @@
     
     
     <div class="description">
-        Application class
+        Application class.
     </div>
     
 
@@ -118,7 +118,13 @@
         <h3 class="subsection-title">Classes</h3>
         
         <dl>
+            <dt><a href="kawapp.mw.html">mw</a></dt>
+            <dd></dd>
+        
             <dt><a href="kawapp.response.html">response</a></dt>
+            <dd></dd>
+        
+            <dt><a href="kawapp.util.html">util</a></dt>
             <dd></dd>
         </dl>
     
@@ -131,14 +137,14 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="END"><span class="type-signature">&lt;static> </span>END<span class="type-signature"> :anonymous</span></h4>
+    <h4 class="name" id="END"><span class="type-signature">&lt;static> </span>END<span class="type-signature"> :Object</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Signal to terminate the middleware sequence.
+        A signature to terminate the middleware sequence.
     </div>
     
     
@@ -147,7 +153,7 @@
         <ul>
             <li>
                 
-<span class="param-type">anonymous</span>
+<span class="param-type">Object</span>
 
 
             </li>
@@ -190,19 +196,30 @@
 
     
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var app = kawapp();
+
+app.use(function(req, res, next) {
+  next(kawapp.END); // send END signal to stop the application
+});
+
+app.use(other_mw);  // this middleware will never be invoked</code></pre>
+
+    
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="SKIP"><span class="type-signature">&lt;static> </span>SKIP<span class="type-signature"> :anonymous</span></h4>
+    <h4 class="name" id="SKIP"><span class="type-signature">&lt;static> </span>SKIP<span class="type-signature"> :Object</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Signal to skip the middleware sequence.
+        A signature to skip the middleware sequence.
     </div>
     
     
@@ -211,7 +228,7 @@
         <ul>
             <li>
                 
-<span class="param-type">anonymous</span>
+<span class="param-type">Object</span>
 
 
             </li>
@@ -254,19 +271,32 @@
 
     
     
+        <h5>Example</h5>
+        
+    <pre class="prettyprint"><code>var sub = kawapp();
+sub.use(function(req, res, next) {
+  next(kawapp.SKIP);
+});
+sub.use(mw1); // this middleware will never be invoked
+
+var main = kawapp();
+main.use(sub);
+main.use(mw2); // this middleware will be invoked otherwise</code></pre>
+
+    
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="END"><span class="type-signature"></span>END<span class="type-signature"> :anonymous</span></h4>
+    <h4 class="name" id="END"><span class="type-signature"></span>END<span class="type-signature"> :Object</span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Signal to terminate the middleware sequence.
+        Alias to `kawapp.END`.
     </div>
     
     
@@ -275,7 +305,7 @@
         <ul>
             <li>
                 
-<span class="param-type">anonymous</span>
+<span class="param-type">Object</span>
 
 
             </li>
@@ -305,7 +335,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line25">line 25</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line23">line 23</a>
     </li></ul></dd>
     
     
@@ -317,17 +347,6 @@
 </dl>
 
     
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var app = kawapp();
-
-app.use(function(req, res, next) {
-  next(kawapp.END); // send END signal to stop the application
-});
-
-app.use(other_mw);  // this middleware will never be invoked</code></pre>
-
     
 </dd>
 
@@ -381,7 +400,7 @@ This means kawapp instance behaves as an Array-like object.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line71">line 71</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line70">line 70</a>
     </li></ul></dd>
     
     
@@ -399,14 +418,14 @@ This means kawapp instance behaves as an Array-like object.
         
             
 <dt>
-    <h4 class="name" id="SKIP"><span class="type-signature"></span>SKIP<span class="type-signature"> :anonymous</span></h4>
+    <h4 class="name" id="mw"><span class="type-signature"></span>mw<span class="type-signature"> :<a href="kawapp.mw.html">kawapp.mw</a></span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Signal to skip the middleware sequence.
+        Alias to `kawapp.mw`.
     </div>
     
     
@@ -415,7 +434,7 @@ This means kawapp instance behaves as an Array-like object.
         <ul>
             <li>
                 
-<span class="param-type">anonymous</span>
+<span class="param-type"><a href="kawapp.mw.html">kawapp.mw</a></span>
 
 
             </li>
@@ -445,7 +464,7 @@ This means kawapp instance behaves as an Array-like object.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line45">line 45</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line284">line 284</a>
     </li></ul></dd>
     
     
@@ -458,109 +477,34 @@ This means kawapp instance behaves as an Array-like object.
 
     
     
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var sub = kawapp();
-sub.use(function(req, res, next) {
-  next(kawapp.SKIP);
-});
-sub.use(mw1); // this middleware will never be invoked
-
-var main = kawapp();
-main.use(sub);
-main.use(mw2); // this middleware will be invoked otherwise</code></pre>
-
-    
 </dd>
 
-        </dl>
-    
-    
-    
-        <h3 class="subsection-title">Methods</h3>
         
-        <dl>
             
 <dt>
-    <h4 class="name" id="location"><span class="type-signature">&lt;static> </span>location<span class="signature">(<span class="optional">defaults</span>)</span><span class="type-signature"> &rarr; {function}</span></h4>
+    <h4 class="name" id="SKIP"><span class="type-signature"></span>SKIP<span class="type-signature"> :Object</span></h4>
     
     
 </dt>
 <dd>
     
-    
     <div class="description">
-        Middleware to set location.
-This would be great when running kawapp not on a browser environment.
+        Alias to `kawapp.SKIP`.
     </div>
     
-
     
     
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Argument</th>
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>defaults</code></td>
-            
-            
-            <td class="type">
-            
+        <h5>Type:</h5>
+        <ul>
+            <li>
                 
 <span class="param-type">Object</span>
 
 
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                    
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last">default location object</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
+            </li>
+        </ul>
     
-    
+
     
 <dl class="details">
     
@@ -584,7 +528,7 @@ This would be great when running kawapp not on a browser environment.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line269">line 269</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line43">line 43</a>
     </li></ul></dd>
     
     
@@ -597,136 +541,34 @@ This would be great when running kawapp not on a browser environment.
 
     
     
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    middleware
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var app = kawapp();
-
-var loc = {
-  href: "http://www.example.com/about"
-};
-app.use(kawapp.location(loc));     // store default location
-
-app.use(function(req, res, next) {
-  console.log(req.location.href);  // fetch location in a middleware
-  next();
-});</code></pre>
-
-    
 </dd>
 
         
             
 <dt>
-    <h4 class="name" id="merge"><span class="type-signature">&lt;static> </span>merge<span class="signature">(mw)</span><span class="type-signature"> &rarr; {function}</span></h4>
+    <h4 class="name" id="util"><span class="type-signature"></span>util<span class="type-signature"> :<a href="kawapp.util.html">kawapp.util</a></span></h4>
     
     
 </dt>
 <dd>
     
-    
     <div class="description">
-        Merge multiple middlewares (or kawapp applications) as a single middleware.
+        Alias to `kawapp.util`.
     </div>
     
-
     
     
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Argument</th>
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>mw</code></td>
-            
-            
-            <td class="type">
-            
+        <h5>Type:</h5>
+        <ul>
+            <li>
                 
-<span class="param-type">function</span>
+<span class="param-type"><a href="kawapp.util.html">kawapp.util</a></span>
 
 
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    
-                
-                    
-                
-                    &lt;repeatable><br>
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last">middlewars or applications</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
+            </li>
+        </ul>
     
-    
+
     
 <dl class="details">
     
@@ -763,370 +605,15 @@ app.use(function(req, res, next) {
 
     
     
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    middleware merged
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var app = kawapp();
-
-var mw = kawapp.merge(mw1, mw2, mw3);  // merge multiple middlewares
-
-app.use(mw);                           // use it as a middleware</code></pre>
-
-    
 </dd>
 
+        </dl>
+    
+    
+    
+        <h3 class="subsection-title">Methods</h3>
         
-            
-<dt>
-    <h4 class="name" id="parseHash"><span class="type-signature">&lt;static> </span>parseHash<span class="signature">(<span class="optional">defaults</span>)</span><span class="type-signature"> &rarr; {function}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Middleware to parse location.hash e.g. `/index.html#!?key=value`
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Argument</th>
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>defaults</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                    
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last">default location.hash string</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line326">line 326</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    middleware
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var app = kawapp();
-
-app.use(kawapp.locationHash());               // without defaults
-
-app.use(kawapp.locationHash("#!?key=value")); // with defaults</code></pre>
-
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="parseQuery"><span class="type-signature">&lt;static> </span>parseQuery<span class="signature">(<span class="optional">defaults</span>)</span><span class="type-signature"> &rarr; {function}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        Middleware to parse location.search e.g. `/index.html?key=value`
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Argument</th>
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>defaults</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                    
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last">default location.search string</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line292">line 292</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    middleware
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-        <h5>Example</h5>
-        
-    <pre class="prettyprint"><code>var app = kawapp();
-
-app.use(kawapp.locationSearch());             // without defaults
-
-app.use(kawapp.locationSearch("?key=value")); // with defaults</code></pre>
-
-    
-</dd>
-
-        
+        <dl>
             
 <dt>
     <h4 class="name" id="mount"><span class="type-signature"></span>mount<span class="signature">(path, mw)</span><span class="type-signature"> &rarr; {<a href="kawapp.html">kawapp</a>}</span></h4>
@@ -1137,7 +624,7 @@ app.use(kawapp.locationSearch("?key=value")); // with defaults</code></pre>
     
     
     <div class="description">
-        Install middlewares which are invoked when path matches.
+        This installs middleware(s) which are invoked when `location.pathname` matches.
     </div>
     
 
@@ -1313,7 +800,7 @@ app.mount("/about/", about_mw);        // test pathname with string
 
 app.mount(/^\/contact\//, contact_mw); // test pathname with regexp
 
-app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run</code></pre>
+app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to install</code></pre>
 
     
 </dd>
@@ -1329,7 +816,7 @@ app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run</code></pr
     
     
     <div class="description">
-        Start application.
+        This invokes a kawapp application.
     </div>
     
 
@@ -1391,7 +878,7 @@ app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run</code></pr
             
             
             
-            <td class="description last">context object a.k.a. locals</td>
+            <td class="description last">context object a.k.a. `locals`</td>
         </tr>
 	
 	
@@ -1430,7 +917,7 @@ app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run</code></pr
             
             
             
-            <td class="description last">response object such as jQuery object</td>
+            <td class="description last">response element such as jQuery object</td>
         </tr>
 	
 	
@@ -1494,7 +981,7 @@ app.mount("/detail/", mw1, mw2, mw3);  // multiple middlewares to run</code></pr
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line192">line 192</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line193">line 193</a>
     </li></ul></dd>
     
     
@@ -1561,7 +1048,7 @@ app.start(context, canvas, function(err, res) {
     
     
     <div class="description">
-        Install middlewares.
+        This installs middleware(s).
     </div>
     
 
@@ -1654,7 +1141,7 @@ app.start(context, canvas, function(err, res) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line91">line 91</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line90">line 90</a>
     </li></ul></dd>
     
     
@@ -1724,7 +1211,7 @@ app.use(function(req, res, next) {
     
     
     <div class="description">
-        Install middlewares which are invoked when conditional function returns true.
+        This installs middleware(s) which are invoked when conditional function returns true.
     </div>
     
 
@@ -1848,7 +1335,7 @@ app.use(function(req, res, next) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line114">line 114</a>
+        <a href="kawapp.js.html">kawapp.js</a>, <a href="kawapp.js.html#line113">line 113</a>
     </li></ul></dd>
     
     
@@ -1893,9 +1380,9 @@ app.use(function(req, res, next) {
         
     <pre class="prettyprint"><code>var app = kawapp();
 
-app.useif(test, mw1, mw2);     // mw1&mw2 will be invoked when condition is true
+app.useif(test, mw1, mw2);     // mw1&mw2 will be invoked only when condition is true
 
-app.use(mw3, mw4);             // mw3&mw4 will be invoked when condition is false
+app.use(mw3, mw4);             // mw3&mw4 will be invoked only when condition is false
 
 function test(req, res) {
   return (req.key == "value"); // test something
@@ -1920,13 +1407,13 @@ function test(req, res) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="kawapp.html">kawapp</a></li><li><a href="kawapp.response.html">response</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="kawapp.html">kawapp</a></li><li><a href="kawapp.mw.html">mw</a></li><li><a href="kawapp.response.html">response</a></li><li><a href="kawapp.util.html">util</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sat Feb 01 2014 21:24:53 GMT+0900 (JST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a> on Sun Feb 02 2014 11:18:23 GMT+0900 (JST)
 </footer>
 
 <script> prettyPrint(); </script>
