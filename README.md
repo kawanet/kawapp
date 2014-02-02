@@ -5,12 +5,12 @@ Kyukou asynchronous Web application framework
 ## Synopsis
 
 ```js
-var kawapp = require("kawapp");  // for node.js
+var kawapp = require("kawapp");    // for node.js
 
 // setup application
 var app = kawapp();
-app.use(kawapp.parseQuery());    // index.html?name=Ken
-app.use(kawapp.parseHash());     // index.html#!?name=Alex
+app.use(kawapp.mw.parseQuery());   // index.html?name=Ken
+app.use(kawapp.mw.parseHash());    // index.html#!?name=Alex
 app.mount("/about/", about);
 app.mount("/contact/", contact);
 app.use(notfound);
