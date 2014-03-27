@@ -88,7 +88,7 @@ function kawapp() {
    * });
    */
   kawapp.prototype.use = function(mw) {
-    for (var i in arguments) {
+    for (var i = 0; i < arguments.length; i++) {
       this[this.length++] = arguments[i];
     }
     return this; // method chaining
