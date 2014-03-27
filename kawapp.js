@@ -205,7 +205,8 @@ function kawapp() {
     if (!res) res = this.res || kawapp.response();
 
     // compile kawapp as a middleware and run it
-    var mw = kawapp.mw.merge.apply(null, this);
+    var array = Array.prototype.slice.call(this);
+    var mw = kawapp.mw.merge.apply(null, array);
     mw(req, res, end);
     return this;
 
@@ -316,7 +317,8 @@ function kawapp() {
         }
         mw = args[idx++];
         if (mw instanceof kawapp) {
-          mw = kawapp.mw.merge.apply(null, mw);
+          var array = Array.prototype.slice.call(mw);
+          mw = kawapp.mw.merge.apply(null, array);
         }
         mw(req, res, iterator);
       }
