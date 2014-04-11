@@ -16,27 +16,27 @@ app.mount("/contact/", contact);
 app.use(notfound);
 
 // run application
-var req = { name: "John" };
-var res = $("#canvas");
-app.start(req, res, end);
+var context = { name: "John" };
+var canvas = $("#canvas");
+app.start(context, canvas, end);
 
 // page middlewares
-function about(req, res, next) {
-  res.empty().append("my name is " + req.name);
+function about(context, canvas, next) {
+  canvas.empty().append("my name is " + context.name);
   next();
 }
 
-function contact(req, res, next) {
-  res.html('<a href="http://twitter.com/kawanet">@kawanet</a>');
+function contact(context, canvas, next) {
+  canvas.html('<a href="http://twitter.com/kawanet">@kawanet</a>');
   next();
 }
 
-function notfound(req, res, next) {
+function notfound(context, canvas, next) {
   next(new Error("invalid request"));
 }
 
 // callback at last
-function end(err, res) {
+function end(err, canvas) {
   if (err) console.log('err', err);
 }
 ```

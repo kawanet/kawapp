@@ -1,6 +1,6 @@
 {
   "name": "kawapp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Kyukou asynchronous Web application framework",
   "license": "MIT",
   "repository": {
