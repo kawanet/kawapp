@@ -32,7 +32,7 @@ function kawapp() {
    * @example
    * var app = kawapp();
    *
-   * app.use(function(req, res, next) {
+   * app.use(function(context, canvas, next) {
    *   next(kawapp.END); // send END signal to stop the application
    * });
    *
@@ -51,7 +51,7 @@ function kawapp() {
    * @member {Object} kawapp.SKIP
    * @example
    * var sub = kawapp();
-   * sub.use(function(req, res, next) {
+   * sub.use(function(context, canvas, next) {
    *   next(kawapp.SKIP);
    * });
    * sub.use(mw1); // this middleware will never be invoked
@@ -76,13 +76,13 @@ function kawapp() {
    * @example
    * var app = kawapp();
    *
-   * app.use(function(req, res, next) {
-   *   var text = req.ok ? "OK" : "NG"; // use req as a locals
-   *   res.append(text);                // use res with append() html() empty() methods
+   * app.use(function(context, canvas, next) {
+   *   var text = context.ok ? "OK" : "NG"; // use context as a locals
+   *   canvas.append(text);                // use canvas with append() html() empty() methods
    *   next();                          // callback to chain middlewares
    * });
    *
-   * app.use(function(req, res, next) {
+   * app.use(function(context, canvas, next) {
    *   var err = new Error("something wrong");
    *   next(err);                       // send error to terminate the application
    * });
@@ -106,8 +106,8 @@ function kawapp() {
    *
    * app.use(mw3, mw4);             // mw3&mw4 will be invoked only when condition is false
    *
-   * function test(req, res) {
-   *   return (req.key == "value"); // test something
+   * function test(context, canvas) {
+   *   return (context.key == "value"); // test something
    * }
    */
   kawapp.prototype.useif = function(cond, mw) {
@@ -120,8 +120,8 @@ function kawapp() {
     // this.when(useif, mw, ...)
     return this.use(subapp);
 
-    function useif(req, res, next) {
-      var ret = cond(req);
+    function useif(context, canvas, next) {
+      var ret = cond(context);
       if (ret instanceof Error) {
         next(ret);
       } else {
@@ -129,7 +129,7 @@ function kawapp() {
       }
     }
 
-    function end(req, res, next) {
+    function end(context, canvas, next) {
       next(kawapp.END);
     }
   };
@@ -161,8 +161,8 @@ function kawapp() {
     args.unshift(mount);
     return this.useif.apply(this, args);
 
-    function mount(req, res, next) {
-      var str = req.location.pathname;
+    function mount(context, canvas, next) {
+      var str = context.location.pathname;
       if (!str) return;
       if (path instanceof RegExp) {
         return path.test(str);
@@ -175,8 +175,8 @@ function kawapp() {
   /**
    * This invokes a kawapp application.
    *
-   * @param {Object} [req] - context object a.k.a. `locals`
-   * @param {response|jQuery|cheerio} [res] - response element such as jQuery object
+   * @param {Object} [context] - request context object a.k.a. `locals`
+   * @param {response|jQuery|cheerio} [canvas] - response element such as jQuery object
    * @param {Function} [callback] - callback function
    * @returns {kawapp}
    * @example
@@ -186,33 +186,33 @@ function kawapp() {
    * var context = {};          // plain object as a request context
    * var canvas = $("#canvas"); // jQuery object as a response canvas
    *
-   * app.start(context, canvas, function(err, res) {
+   * app.start(context, canvas, function(err, canvas) {
    *   if (err) console.error(err);
    * });
    */
-  kawapp.prototype.start = function(req, res, callback) {
+  kawapp.prototype.start = function(context, canvas, callback) {
     // both request and response are optional
-    if (arguments.length == 1 && "function" === typeof req) {
-      callback = req;
-      req = null;
-    } else if (arguments.length == 2 && "function" === typeof res) {
-      callback = res;
-      res = null;
+    if (arguments.length == 1 && "function" === typeof context) {
+      callback = context;
+      context = null;
+    } else if (arguments.length == 2 && "function" === typeof canvas) {
+      callback = canvas;
+      canvas = null;
     }
 
     // default parameteres
-    if (!req) req = this.req || kawapp.request();
-    if (!res) res = this.res || kawapp.response();
+    if (!context) context = this.context || kawapp.request();
+    if (!canvas) canvas = this.canvas || kawapp.response();
 
     // compile kawapp as a middleware and run it
     var array = Array.prototype.slice.call(this);
     var mw = kawapp.mw.merge.apply(null, array);
-    mw(req, res, end);
+    mw(context, canvas, end);
     return this;
 
     function end(err) {
       if (err === kawapp.END) err = null;
-      if (callback) callback(err, res);
+      if (callback) callback(err, canvas);
     }
   };
 })(kawapp);
@@ -305,7 +305,7 @@ function kawapp() {
     var args = arguments;
     return merge;
 
-    function merge(req, res, next) {
+    function merge(context, canvas, next) {
       var idx = 0;
       iterator();
 
@@ -320,7 +320,7 @@ function kawapp() {
           var array = Array.prototype.slice.call(mw);
           mw = kawapp.mw.merge.apply(null, array);
         }
-        mw(req, res, iterator);
+        mw(context, canvas, iterator);
       }
     }
   };
@@ -340,8 +340,8 @@ function kawapp() {
    * };
    * app.use(kawapp.location(loc));     // store default location
    *
-   * app.use(function(req, res, next) {
-   *   console.log(req.location.href);  // fetch location in a middleware
+   * app.use(function(context, canvas, next) {
+   *   console.log(context.location.href);  // fetch location in a middleware
    *   next();
    * });
    */
@@ -349,9 +349,9 @@ function kawapp() {
     /* global location */
     return _location;
 
-    function _location(req, res, next) {
-      if (!req.location) {
-        req.location = ("undefined" !== typeof location) ? location : defaults || {};
+    function _location(context, canvas, next) {
+      if (!context.location) {
+        context.location = ("undefined" !== typeof location) ? location : defaults || {};
       }
       next();
     }
@@ -369,28 +369,28 @@ function kawapp() {
    *
    * app.use(kawapp.mw.parseQuery("param", "?key=value"));
    *
-   * app.use(function(req, res, next) {
-   *   console.log(req.param.key); // => "value"
+   * app.use(function(context, canvas, next) {
+   *   console.log(context.param.key); // => "value"
    *   next();
    * });
    */
   mw.parseQuery = function(root, defaults) {
     return _parseQuery;
 
-    function _parseQuery(req, res, next) {
-      if (req.locationSearch) return next(); // already parsed
-      kawapp.mw.location()(req, res, function(err) {
+    function _parseQuery(context, canvas, next) {
+      if (context.locationSearch) return next(); // already parsed
+      kawapp.mw.location()(context, canvas, function(err) {
         if (err) return next(err);
-        return parseQuery(req, res, next);
+        return parseQuery(context, canvas, next);
       });
     }
 
-    function parseQuery(req, res, next) {
-      if (root && !req[root]) req[root] = {};
-      var param = root ? req[root] : req;
-      var q = req.location.search || defaults;
+    function parseQuery(context, canvas, next) {
+      if (root && !context[root]) context[root] = {};
+      var param = root ? context[root] : context;
+      var q = context.location.search || defaults;
       if (q && q.length > 1) {
-        var p = req.locationSearch = kawapp.util.parseParam(q.substr(1));
+        var p = context.locationSearch = kawapp.util.parseParam(q.substr(1));
         for (var key in p) {
           param[key] = p[key];
         }
@@ -411,28 +411,28 @@ function kawapp() {
    *
    * app.use(kawapp.parseHash("param", "#!?key=value"));
    *
-   * app.use(function(req, res, next) {
-   *   console.log(req.param.key); // => "value"
+   * app.use(function(context, canvas, next) {
+   *   console.log(context.param.key); // => "value"
    *   next();
    * });
    */
   mw.parseHash = function(root, defaults) {
     return _parseHash;
 
-    function _parseHash(req, res, next) {
-      if (req.locationHash) return next(); // already parsed
-      kawapp.mw.location()(req, res, function(err) {
+    function _parseHash(context, canvas, next) {
+      if (context.locationHash) return next(); // already parsed
+      kawapp.mw.location()(context, canvas, function(err) {
         if (err) return next(err);
-        return parseHash(req, res, next);
+        return parseHash(context, canvas, next);
       });
     }
 
-    function parseHash(req, res, next) {
-      if (root && !req[root]) req[root] = {};
-      var param = root ? req[root] : req;
-      var q = req.location.hash || defaults;
+    function parseHash(context, canvas, next) {
+      if (root && !context[root]) context[root] = {};
+      var param = root ? context[root] : context;
+      var q = context.location.hash || defaults;
       if (q && q.search(/^#!.*\?/) > -1) {
-        var p = req.locationHash = kawapp.util.parseParam(q.replace(/^#!.*\?/, ""));
+        var p = context.locationHash = kawapp.util.parseParam(q.replace(/^#!.*\?/, ""));
         for (var key in p) {
           param[key] = p[key];
         }
@@ -468,8 +468,8 @@ function kawapp() {
    *
    * app.use(some_mw);
    *
-   * app.start(function(err, res) {
-   *   $("#canvas").append(res[0]);
+   * app.start(function(err, canvas) {
+   *   $("#canvas").append(canvas[0]);
    * });
    */
   response.prototype.length = 1;
@@ -482,8 +482,8 @@ function kawapp() {
    * @example
    * var app = kawapp();
    *
-   * app.use(function(req, res, next) {
-   *   res.empty().append("hi, there!");
+   * app.use(function(context, canvas, next) {
+   *   canvas.empty().append("hi, there!");
    * });   */
   response.prototype.empty = function() {
     this[0].length = 0;
@@ -499,9 +499,9 @@ function kawapp() {
    * @example
    * var app = kawapp();
    *
-   * app.use(function(req, res, next) {
-   *   res.append("foo");
-   *   res.append("bar");
+   * app.use(function(context, canvas, next) {
+   *   canvas.append("foo");
+   *   canvas.append("bar");
    * });
    */
   response.prototype.append = function() {
@@ -522,12 +522,12 @@ function kawapp() {
    * @example
    * var app = kawapp();
    *
-   * app.use(function(req, res, next) {
-   *   res.html("Hello!");
+   * app.use(function(context, canvas, next) {
+   *   canvas.html("Hello!");
    * });
    *
-   * app.start(function(err, res) {
-   *   console.log(res.html());       // => "Hello!"
+   * app.start(function(err, canvas) {
+   *   console.log(canvas.html());       // => "Hello!"
    * });
    */
   response.prototype.html = function(html) {

@@ -19,21 +19,21 @@ function tests(kawapp) {
 
     it('use', function(done) {
       var app = kawapp();
-      app.use(function(req, res, next) {
-        req.foo = "FOO";
+      app.use(function(context, canvas, next) {
+        context.foo = "FOO";
         next();
       });
       app.use(kawapp.mw.location());
       app.use(kawapp.mw.parseQuery());
       app.use(kawapp.mw.parseHash());
-      app.use(function(req, res, next) {
-        req.bar = "BAR";
+      app.use(function(context, canvas, next) {
+        context.bar = "BAR";
         next();
       });
-      var req = {};
-      app.start(req, null, function(err) {
-        assert.equal(req.foo, "FOO");
-        assert.equal(req.bar, "BAR");
+      var context = {};
+      app.start(context, null, function(err) {
+        assert.equal(context.foo, "FOO");
+        assert.equal(context.bar, "BAR");
         done();
       });
     });

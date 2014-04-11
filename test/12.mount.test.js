@@ -8,19 +8,19 @@ function tests(kawapp) {
   return function() {
     describe('mount', function() {
       var app = kawapp();
-      app.mount("/foo/bar/", function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/foo/bar/";
+      app.mount("/foo/bar/", function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/foo/bar/";
         next();
       });
-      app.mount("/foo/", function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/foo/";
+      app.mount("/foo/", function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/foo/";
         next();
       });
-      app.mount("/", function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/";
+      app.mount("/", function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/";
         next();
       });
       mount_tests(app);
@@ -28,19 +28,19 @@ function tests(kawapp) {
 
     describe('mount by regexp', function() {
       var app = kawapp();
-      app.mount(/^\/foo\/bar\//, function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/foo/bar/";
+      app.mount(/^\/foo\/bar\//, function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/foo/bar/";
         next();
       });
-      app.mount(/^\/foo\//, function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/foo/";
+      app.mount(/^\/foo\//, function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/foo/";
         next();
       });
-      app.mount(/^\//, function(req, res, next) {
-        if (req.path) return next(req.path);
-        req.path = "/";
+      app.mount(/^\//, function(context, canvas, next) {
+        if (context.path) return next(context.path);
+        context.path = "/";
         next();
       });
       mount_tests(app);
@@ -50,42 +50,42 @@ function tests(kawapp) {
 
 function mount_tests(app) {
   it('pathname: /foo/bar/', function(done) {
-    var req = { location: { pathname: "/foo/bar/"} };
-    app.start(req, null, function(err) {
+    var context = { location: { pathname: "/foo/bar/"} };
+    app.start(context, null, function(err) {
       assert(!err, err);
-      assert.equal(req.path, "/foo/bar/");
+      assert.equal(context.path, "/foo/bar/");
       done();
     });
   });
   it('pathname: /foo/buz/', function(done) {
-    var req = { location: { pathname: "/foo/buz/"} };
-    app.start(req, null, function(err) {
+    var context = { location: { pathname: "/foo/buz/"} };
+    app.start(context, null, function(err) {
       assert(!err, err);
-      assert.equal(req.path, "/foo/");
+      assert.equal(context.path, "/foo/");
       done();
     });
   });
   it('pathname: /', function(done) {
-    var req = { location: { pathname: "/"} };
-    app.start(req, null, function(err) {
+    var context = { location: { pathname: "/"} };
+    app.start(context, null, function(err) {
       assert(!err, err);
-      assert.equal(req.path, "/");
+      assert.equal(context.path, "/");
       done();
     });
   });
   it('pathname: /index.html', function(done) {
-    var req = { location: { pathname: "/index.html"} };
-    app.start(req, null, function(err) {
+    var context = { location: { pathname: "/index.html"} };
+    app.start(context, null, function(err) {
       assert(!err, err);
-      assert.equal(req.path, "/");
+      assert.equal(context.path, "/");
       done();
     });
   });
   it('pathname: /foo/bar/index.html', function(done) {
-    var req = { location: { pathname: "/foo/bar/index.html"} };
-    app.start(req, null, function(err) {
+    var context = { location: { pathname: "/foo/bar/index.html"} };
+    app.start(context, null, function(err) {
       assert(!err, err);
-      assert.equal(req.path, "/foo/bar/");
+      assert.equal(context.path, "/foo/bar/");
       done();
     });
   });
